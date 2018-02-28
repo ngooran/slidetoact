@@ -9,7 +9,6 @@ jobs:
       CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
       ANDROID_HOME: /usr/local/android-sdk-linux
-      GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"
       _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
     docker:
@@ -32,7 +31,7 @@ jobs:
         - v1-dep-master-
         # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
         - v1-dep-
-    - run: if [ -a ./gradlew ]; then gradlew dependencies; else gradle dependencies; fi
+    - run: if [ -a ./gradlew ]; then ./gradlew dependencies; else gradle dependencies; fi
     - save_cache:
         key: v1-dep-{{ .Branch }}-{{ epoch }}
         paths:
