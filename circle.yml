@@ -33,9 +33,9 @@ jobs:
         - ~/.m2
         - ~/.bundle
         - ~/.gradle
-    
-    - run:
-        command: emulator -avd circleci-android22 -no-audio -no-window
+    - run: sdkmanager "system-images;android-22;default;armeabi-v7a" && echo "no" | avdmanager create avd -n test -k "system-images;android-22;default;armeabi-v7a"
+    - run: 
+        command: export LD_LIBRARY_PATH=${ANDROID_HOME}/emulator/lib64:${ANDROID_HOME}/emulator/lib64/qt/lib && emulator64-arm -avd test -noaudio -no-boot-anim -no-window -accel on
         background: true
     - run: circle-android wait-for-boot
     - run: adb shell settings put global window_animation_scale 0
