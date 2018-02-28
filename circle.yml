@@ -8,7 +8,6 @@ jobs:
     environment:
       CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
       CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
-      ANDROID_HOME: /usr/local/android-sdk-linux
       _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
     docker:
@@ -34,8 +33,6 @@ jobs:
         - ~/.m2
         - ~/.bundle
         - ~/.gradle
-        - /usr/local/android-sdk-linux/platforms/android-26
-        - /usr/local/android-sdk-linux/build-tools/26.0.2
     
     - run:
         command: emulator -avd circleci-android22 -no-audio -no-window
