@@ -1,36 +1,70 @@
-machine:
-  java:
-      version: oraclejdk8
-  environment:
+version: 2
+jobs:
+  build:
+    working_directory: ~/cortinico/slidetoact
+    parallelism: 1
+    shell: /bin/bash --login
+    
+    environment:
+      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
       ANDROID_HOME: /usr/local/android-sdk-linux
-      GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"'
-      _JAVA_OPTIONS: "-Xms512m -Xmx1024m"
+      GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"
+      _JAVA_OPTIONS: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap"
 
-dependencies:
-  pre:
-    - if [ ! -d "/usr/local/android-sdk-linux/platforms/android-26" ]; then echo y | android update sdk --no-ui --all --filter "android-26"; fi
-    - if [ ! -d "/usr/local/android-sdk-linux/build-tools/26.0.2" ]; then echo y | android update sdk --no-ui --all --filter "build-tools-26.0.2"; fi
-  cache_directories:
-    - /usr/local/android-sdk-linux/platforms/android-26
-    - /usr/local/android-sdk-linux/build-tools/26.0.2
-
-test:
-  pre:
-    - emulator -avd circleci-android22 -no-audio -no-window:
+    docker:
+      - image: circleci/android:api-26-alpha
+      
+    steps:
+    - checkout
+    - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
+    - run:
+        working_directory: ~/cortinico/slidetoact
+        command: sudo update-alternatives --set java /usr/lib/jvm/jdk1.8.0/bin/java; sudo update-alternatives --set javac /usr/lib/jvm/jdk1.8.0/bin/javac; echo -e "export JAVA_HOME=/usr/lib/jvm/jdk1.8.0" >> $BASH_ENV
+    - run:
+        working_directory: ~/cortinico/slidetoact
+        command: echo -e "export ANDROID_HOME=/usr/local/android-sdk-linux\nexport GRADLE_OPTS=-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"\nexport _JAVA_OPTIONS=-Xms512m -Xmx1024m" >> $BASH_ENV
+    - restore_cache:
+        keys:
+        # This branch if available
+        - v1-dep-{{ .Branch }}-
+        # Default branch if not
+        - v1-dep-master-
+        # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
+        - v1-dep-
+    - run: if [ ! -d "/usr/local/android-sdk-linux/platforms/android-26" ]; then echo y | android update sdk --no-ui --all --filter "android-26"; fi
+    - run: if [ ! -d "/usr/local/android-sdk-linux/build-tools/26.0.2" ]; then echo y | android update sdk --no-ui --all --filter "build-tools-26.0.2"; fi
+    - run: if [ -a ./gradlew ]; then gradlew dependencies; else gradle dependencies; fi
+    - save_cache:
+        key: v1-dep-{{ .Branch }}-{{ epoch }}
+        paths:
+        - vendor/bundle
+        - ~/virtualenvs
+        - ~/.m2
+        - ~/.bundle
+        - ~/.gradle
+        - /usr/local/android-sdk-linux/platforms/android-26
+        - /usr/local/android-sdk-linux/build-tools/26.0.2
+    
+    - run:
+        command: emulator -avd circleci-android22 -no-audio -no-window
         background: true
+    - run: circle-android wait-for-boot
+    - run: adb shell settings put global window_animation_scale 0
+    - run: adb shell settings put global transition_animation_scale 0
+    - run: adb shell settings put global animator_duration_scale 0
+    - run: sleep 30
+    - run: adb shell input keyevent 82
+    - run:
+        command: ./gradlew clean build lint test connectedCheck -PdisablePreDex
+        no_output_timeout: 32000s
+    - run: cp -r slidetoact/build/outputs $CIRCLE_ARTIFACTS
+    - run: cp -r example/build/outputs $CIRCLE_ARTIFACTS
+    - run: cp -r example/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
 
-  override:
-    - circle-android wait-for-boot
-    - adb shell settings put global window_animation_scale 0:
-      background: true
-    - adb shell settings put global transition_animation_scale 0:
-      background: true
-    - adb shell settings put global animator_duration_scale 0:
-      background: true
-    - sleep 30
-    - adb shell input keyevent 82:
-    - ./gradlew clean build lint test connectedCheck -PdisablePreDex:
-        timeout: 32000
-    - cp -r slidetoact/build/outputs $CIRCLE_ARTIFACTS
-    - cp -r example/build/outputs $CIRCLE_ARTIFACTS
-    - cp -r example/build/outputs/androidTest-results/* $CIRCLE_TEST_REPORTS
+    - store_test_results:
+        path: /tmp/circleci-test-results
+    - store_artifacts:
+        path: /tmp/circleci-artifacts
+    - store_artifacts:
+        path: /tmp/circleci-test-results
