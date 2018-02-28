@@ -17,12 +17,6 @@ jobs:
     steps:
     - checkout
     - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
-    - run:
-        working_directory: ~/cortinico/slidetoact
-        command: sudo update-alternatives --set java /usr/lib/jvm/jdk1.8.0/bin/java; sudo update-alternatives --set javac /usr/lib/jvm/jdk1.8.0/bin/javac; echo -e "export JAVA_HOME=/usr/lib/jvm/jdk1.8.0" >> $BASH_ENV
-    - run:
-        working_directory: ~/cortinico/slidetoact
-        command: echo -e "export ANDROID_HOME=/usr/local/android-sdk-linux\nexport GRADLE_OPTS=-Dorg.gradle.jvmargs="-Xmx2048m -XX:+HeapDumpOnOutOfMemoryError"\nexport _JAVA_OPTIONS=-Xms512m -Xmx1024m" >> $BASH_ENV
     - restore_cache:
         keys:
         # This branch if available
