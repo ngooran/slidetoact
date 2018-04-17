@@ -76,7 +76,7 @@ class SlideToActView(context: Context,
     var typeFace = Typeface.NORMAL
         set(value) {
             field = value
-            mTextPaint.typeface = Typeface.create("sans-serif-light" , value)
+            mTextPaint.typeface = Typeface.create(Typeface.DEFAULT, value)
             invalidate()
         }
 
