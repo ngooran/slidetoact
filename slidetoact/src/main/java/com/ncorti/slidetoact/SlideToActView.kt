@@ -518,6 +518,10 @@ class SlideToActView(context: Context,
         return this.mIsAnimating
     }
 
+    fun setIsAnimating(animating: Boolean) {
+        this.mIsAnimating = animating
+    }
+
     /**
      * Private method that is performed when you want to reset the cursor
      */
