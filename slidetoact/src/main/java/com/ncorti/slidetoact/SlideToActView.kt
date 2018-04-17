@@ -167,6 +167,9 @@ class SlideToActView(context: Context,
     /** Private flag to check if the slide gesture have been completed */
     private var mIsCompleted = false
 
+    /** Private flag to check if the slider is still working and showing animations */
+    private var mIsAnimating = false
+
     /** Public flag to lock the slider */
     var isLocked = false
 
@@ -300,7 +303,6 @@ class SlideToActView(context: Context,
 
         // Arrow angle
         mArrowAngle = -180 * mPositionPerc
-        canvas.rotate(mArrowAngle, mInnerRect.centerX(), mInnerRect.centerY())
         mDrawableArrow.setBounds(mInnerRect.left.toInt() + mArrowMargin,
             mInnerRect.top.toInt() + mArrowMargin,
             mInnerRect.right.toInt() - mArrowMargin,
@@ -309,7 +311,6 @@ class SlideToActView(context: Context,
             mDrawableArrow.bounds.top <= mDrawableArrow.bounds.bottom) {
             mDrawableArrow.draw(canvas)
         }
-        canvas.rotate(-1 * mArrowAngle, mInnerRect.centerX(), mInnerRect.centerY())
 
         // Tick drawing
         mDrawableTick.setBounds(
@@ -404,6 +405,7 @@ class SlideToActView(context: Context,
      * Private method that is performed when user completes the slide
      */
     private fun startAnimationComplete() {
+        mIsAnimating = true
         val animSet = AnimatorSet()
 
         // Animator that moves the cursor
@@ -506,6 +508,14 @@ class SlideToActView(context: Context,
      */
     fun isCompleted(): Boolean {
         return this.mIsCompleted
+    }
+
+    /**
+     * Method that returns the 'mIsAnimating' flag
+     * @return True if slider is still working and showing animation
+     */
+    fun isAnimating(): Boolean {
+        return this.mIsAnimating
     }
 
     /**
