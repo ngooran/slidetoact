@@ -455,9 +455,9 @@ class SlideToActView(context: Context,
         }
 
         if (mPosition >= mAreaWidth - mAreaHeight) {
-            animSet.playSequentially(marginAnimator, areaAnimator, tickAnimator)
+            animSet.playSequentially(marginAnimator, areaAnimator)
         } else {
-            animSet.playSequentially(finalPositionAnimator, marginAnimator, areaAnimator, tickAnimator)
+            animSet.playSequentially(finalPositionAnimator, marginAnimator, areaAnimator)
         }
 
         animSet.duration = 300
