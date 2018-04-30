@@ -6,11 +6,7 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.content.res.Resources
 import android.content.res.TypedArray
-import android.graphics.Canvas
-import android.graphics.Outline
-import android.graphics.Paint
-import android.graphics.RectF
-import android.graphics.Typeface
+import android.graphics.*
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -101,6 +97,7 @@ class SlideToActView(context: Context,
             field = value
             mInnerPaint.color = value
             mTextPaint.color = value
+            mDrawableRight.setTint(value)
             invalidate()
         }
 
@@ -135,12 +132,18 @@ class SlideToActView(context: Context,
     /** Arrow drawable */
     private val mDrawableArrow: VectorDrawableCompat
 
+    /** Arrow drawable */
+    private val mDrawableRight: VectorDrawableCompat
+
     /** Tick drawable, is actually an AnimatedVectorDrawable */
     private val mDrawableTick: Drawable
     private var mFlagDrawTick: Boolean = false
 
     /** The icon for the drawable */
     private var mIcon: Int = R.drawable.ic_arrow
+
+    /** The icon for the right drawable */
+    private var mRightIcon: Int = R.drawable.ic_unlocked
 
     /* -------------------- PAINT & DRAW -------------------- */
     /** Paint used for outer elements */
@@ -205,6 +208,7 @@ class SlideToActView(context: Context,
             mActualAreaMargin = mOriginAreaMargin
 
             mIcon = layoutAttrs.getResourceId(R.styleable.SlideToActView_slider_icon, R.drawable.ic_arrow)
+            mRightIcon = layoutAttrs.getResourceId(R.styleable.SlideToActView_slider_right_icon, R.drawable.ic_unlocked)
         } finally {
             layoutAttrs.recycle()
         }
@@ -216,6 +220,7 @@ class SlideToActView(context: Context,
         mOuterRect = RectF(mActualAreaWidth.toFloat(), 0f, mAreaWidth.toFloat() - mActualAreaWidth.toFloat(), mAreaHeight.toFloat())
 
         mDrawableArrow = parseVectorDrawableCompat(context.resources, mIcon, context.theme)
+        mDrawableRight = parseVectorDrawableCompat(context.resources, mRightIcon, context.theme)
 
         // Due to bug in the AVD implementation in the support library, we use it only for API < 21
         mDrawableTick = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -300,6 +305,12 @@ class SlideToActView(context: Context,
 
         // Vertical + Horizontal centering
         canvas.drawText(text.toString(), mTextXPosition, mTextYPosition, mTextPaint)
+
+        // Right Icon
+        mDrawableRight.setBounds((mOuterRect.right.toInt() - mAreaHeight + mArrowMargin * 1.75).toInt(), (mOuterRect.top.toInt() + mArrowMargin * 1.75).toInt(),
+                (mOuterRect.right.toInt() - mArrowMargin * 1.75).toInt(),
+                (mOuterRect.bottom.toInt() - mArrowMargin * 1.75).toInt())
+        mDrawableRight.draw(canvas)
 
         // Arrow angle
         mArrowAngle = -180 * mPositionPerc
@@ -466,6 +477,7 @@ class SlideToActView(context: Context,
 
         animSet.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(p0: Animator?) {
+                mDrawableRight.alpha = 0
                 onSlideToActAnimationEventListener?.onSlideCompleteAnimationStarted(this@SlideToActView, mPositionPerc)
             }
 
@@ -571,11 +583,12 @@ class SlideToActView(context: Context,
 
 
         marginAnimator.interpolator = OvershootInterpolator(2f)
-        animSet.playSequentially(tickAnimator, areaAnimator, positionAnimator, marginAnimator, arrowAnimator)
+        animSet.playSequentially(areaAnimator, positionAnimator, marginAnimator, arrowAnimator)
         animSet.duration = 300
 
         animSet.addListener(object : Animator.AnimatorListener {
             override fun onAnimationStart(p0: Animator?) {
+                mDrawableRight.alpha = 255
                 onSlideToActAnimationEventListener?.onSlideResetAnimationStarted(this@SlideToActView)
             }
 
