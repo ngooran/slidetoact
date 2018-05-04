@@ -77,7 +77,12 @@ class SlideToActView(context: Context,
         }
 
     /** Size for the text message */
-    private val mTextSize: Int
+    var mTextSize = 16
+        set(value) {
+            field = value
+            mTextPaint.textSize = value.toFloat()
+            invalidate()
+        }
 
     private var mTextYPosition = -1f
     private var mTextXPosition = -1f
