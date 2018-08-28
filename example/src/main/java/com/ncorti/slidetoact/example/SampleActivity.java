@@ -138,6 +138,12 @@ public class SampleActivity extends AppCompatActivity {
                 log.append("\n" + getTime() + " onSlideResetAnimationEnded");
             }
         });
+        slide.setOnSlideStartedListener(new SlideToActView.OnSlideStartedListener() {
+            @Override
+            public void onSlideStarted(@NonNull SlideToActView view) {
+                log.append("\n" + getTime() + " onSlideStarted");
+            }
+        });
     }
 
     private String getTime() {

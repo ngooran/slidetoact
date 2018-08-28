@@ -181,10 +181,13 @@ class SlideToActView(context: Context,
     /** Public flag to lock the slider */
     var isLocked = false
 
+    private var mIsStartedOnce = false
+
     /** Public Slide event listeners */
     var onSlideToActAnimationEventListener: OnSlideToActAnimationEventListener? = null
     var onSlideCompleteListener: OnSlideCompleteListener? = null
     var onSlideResetListener: OnSlideResetListener? = null
+    var onSlideStartedListener: OnSlideStartedListener? = null
 
     init {
         val actualOuterColor : Int
@@ -415,6 +418,13 @@ class SlideToActView(context: Context,
             mPosition = 0
         if (mPosition > (mAreaWidth - mAreaHeight))
             mPosition = mAreaWidth - mAreaHeight
+        if (mPosition == 0) {
+            mIsStartedOnce = false
+        }
+        if (mPosition > 16 && mPosition < 80 && !mIsStartedOnce) {
+            onSlideStartedListener?.onSlideStarted(this@SlideToActView)
+            mIsStartedOnce = true
+        }
     }
 
     /**
@@ -698,6 +708,18 @@ class SlideToActView(context: Context,
          * @param view The SlideToActView who created the event
          */
         fun onSlideReset(view: SlideToActView)
+    }
+
+    /**
+     * Event handler for the slide started event.
+     * Use this handler to find out if the user started to slide the slider.
+     */
+    interface OnSlideStartedListener {
+        /**
+         * Called when the user startes to slide the slider
+         * @param view The SlideToActView who created the event
+         */
+        fun onSlideStarted(view: SlideToActView)
     }
 
     /**
