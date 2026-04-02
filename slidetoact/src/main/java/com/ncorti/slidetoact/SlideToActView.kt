@@ -206,7 +206,7 @@ class SlideToActView(context: Context,
             val defaultInner = ContextCompat.getColor(this.context, R.color.white)
             actualOuterColor = layoutAttrs.getColor(R.styleable.SlideToActView_outer_color, defaultOuter)
             actualInnerColor = layoutAttrs.getColor(R.styleable.SlideToActView_inner_color, defaultInner)
-            text = layoutAttrs.getString(R.styleable.SlideToActView_text)
+            text = layoutAttrs.getString(R.styleable.SlideToActView_text) ?: ""
             typeFace = layoutAttrs.getInt(R.styleable.SlideToActView_text_style, 0)
 
             isLocked = layoutAttrs.getBoolean(R.styleable.SlideToActView_slider_locked, false)
@@ -291,9 +291,8 @@ class SlideToActView(context: Context,
         mTextYPosition = (mAreaHeight.toFloat() / 2) - (mTextPaint.descent() + mTextPaint.ascent()) / 2
     }
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        if (canvas == null) return
 
         // Outer area
         mOuterRect.set(mActualAreaWidth.toFloat(), 0f, mAreaWidth.toFloat() - mActualAreaWidth.toFloat(), mAreaHeight.toFloat())
@@ -350,8 +349,8 @@ class SlideToActView(context: Context,
         }
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event != null && isEnabled) {
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (isEnabled) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
                     if (checkInsideButton(event.x, event.y)) {
