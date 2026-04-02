@@ -491,21 +491,21 @@ class SlideToActView(context: Context,
         animSet.duration = 300
 
         animSet.addListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(p0: Animator?) {
+            override fun onAnimationStart(p0: Animator) {
                 mDrawableRight.alpha = 0
                 onSlideToActAnimationEventListener?.onSlideCompleteAnimationStarted(this@SlideToActView, mPositionPerc)
             }
 
-            override fun onAnimationCancel(p0: Animator?) {
+            override fun onAnimationCancel(p0: Animator) {
             }
 
-            override fun onAnimationEnd(p0: Animator?) {
+            override fun onAnimationEnd(p0: Animator) {
                 mIsCompleted = true
                 onSlideToActAnimationEventListener?.onSlideCompleteAnimationEnded(this@SlideToActView)
                 onSlideCompleteListener?.onSlideComplete(this@SlideToActView)
             }
 
-            override fun onAnimationRepeat(p0: Animator?) {
+            override fun onAnimationRepeat(p0: Animator) {
             }
         })
         animSet.start()
@@ -602,22 +602,22 @@ class SlideToActView(context: Context,
         animSet.duration = 300
 
         animSet.addListener(object : Animator.AnimatorListener {
-            override fun onAnimationStart(p0: Animator?) {
+            override fun onAnimationStart(p0: Animator) {
                 mDrawableRight.alpha = 255
                 onSlideToActAnimationEventListener?.onSlideResetAnimationStarted(this@SlideToActView)
             }
 
-            override fun onAnimationCancel(p0: Animator?) {
+            override fun onAnimationCancel(p0: Animator) {
             }
 
-            override fun onAnimationEnd(p0: Animator?) {
+            override fun onAnimationEnd(p0: Animator) {
                 isEnabled = true
                 stopTickAnimation()
                 onSlideToActAnimationEventListener?.onSlideResetAnimationEnded(this@SlideToActView)
                 onSlideResetListener?.onSlideReset(this@SlideToActView)
             }
 
-            override fun onAnimationRepeat(p0: Animator?) {
+            override fun onAnimationRepeat(p0: Animator) {
             }
         })
         animSet.start()
